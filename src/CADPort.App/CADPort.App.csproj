@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>CADPort.App</RootNamespace>
+    <AssemblyName>CADPort.App</AssemblyName>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      HelixToolkit.Wpf provides the CAD-style 3D viewport (orbit/pan/zoom),
+      mesh/box visuals, hit-testing and ray helpers used by the workspace.
+      2.25.0+ ships a net8.0-windows target. If NuGet restore cannot find this
+      exact version on your feed, bump to the latest 2.x (e.g. 2.27.0).
+    -->
+    <PackageReference Include="HelixToolkit.Wpf" Version="2.25.0" />
+  </ItemGroup>
+
+</Project>
