@@ -130,7 +130,11 @@ namespace CADPort.App.Visualization
                 PlaneW, PlaneL, PostPlaneThickness, Color.FromRgb(0xFF, 0xD1, 0x4A), 190);
             result.Visuals.Add(plane);
             result.Selectable[plane] = pos;
-            result.PostTradePlanes[plane] = pos;
+
+            // Cash is the residual funding security - its level is derived from the
+            // trades on other securities, so it is not directly draggable.
+            if (!pos.IsCash)
+                result.PostTradePlanes[plane] = pos;
         }
 
         private void BuildOverlays(SceneBuildResult result, SecurityPosition pos, Point3D origin)
@@ -173,7 +177,7 @@ namespace CADPort.App.Visualization
                 double cumulative = 0;
                 var lots = security.IsCash
                     ? _portfolio.AggregateLots(security)
-                    : _portfolio.AggregateLots(security).OrderByDescending(l => l.GainLossPercent);
+                    : _portfolio.AggregateLots(security).OrderByDescending(l => l.SortGainLossPercent);
 
                 foreach (var lot in lots)
                 {

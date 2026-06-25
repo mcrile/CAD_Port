@@ -30,6 +30,32 @@ namespace CADPort.App.Services
             return trades;
         }
 
+        /// <summary>
+        /// Push the proposed cash level onto each account's cash post-trade plane:
+        /// sales raise cash, purchases consume it, plus the external cash adjustment.
+        /// This keeps the cash column visually in sync with the derived trades.
+        /// </summary>
+        public static void SyncCashPostTrade(Portfolio portfolio, IEnumerable<TradeProposal> trades)
+        {
+            var tradeList = trades as IList<TradeProposal> ?? trades.ToList();
+
+            foreach (var account in portfolio.Accounts)
+            {
+                var cashPos = portfolio.GetCashPosition(account);
+                if (cashPos == null) continue;
+
+                var proceeds = tradeList
+                    .Where(t => t.Account == account && t.Side == TradeSide.Sell)
+                    .Sum(t => t.MarketValue);
+                var cost = tradeList
+                    .Where(t => t.Account == account && t.Side == TradeSide.Buy)
+                    .Sum(t => t.MarketValue);
+
+                var proposedCash = cashPos.CurrentMarketValue + account.CashAdjustment + proceeds - cost;
+                cashPos.PostTradeShares = Math.Max(0, Math.Round(proposedCash)); // cash price == 1
+            }
+        }
+
         private static TradeProposal BuildSale(SecurityPosition pos, double sharesToSell)
         {
             var price = pos.Security.Price;

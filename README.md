@@ -87,9 +87,15 @@ These are deliberate, documented choices where the spec left room:
   security's household target across accounts in proportion to current holdings (so
   accounts keep their tilts and *drift*), with cash as the per-account residual so each
   account total still equals its post value.
-- **Lot ordering / coloring:** stack/sell order by unrealized return vs cost basis
-  (largest loss first). Color intensity uses unrealized G/L ÷ market value, saturating
-  at ±30%.
+- **Lot ordering / coloring:** stack/sell order by a *tax-aware* unrealized return
+  vs cost basis (largest loss first). Lots in tax-exempt accounts (and cash) have no
+  tax consequence, so they sort as neutral rather than by gain/loss - flipping an
+  account to tax-exempt drops its lots out of the harvest ordering. Color intensity
+  uses unrealized G/L ÷ market value, saturating at ±30%; tax-exempt/cash render white.
+- **Cash follows the trades:** cash is the residual funding security and is not
+  dragged directly. Each account's cash post-trade level is derived from its proposed
+  trades (sales raise cash, purchases consume it) plus the external cash adjustment,
+  so the cash column moves live as you build trades.
 - **Estimated tax cost:** flat 25% rate applied to net realized gain/loss from
   **taxable** accounts only (negative = tax benefit). No wash-sale logic (out of scope).
 

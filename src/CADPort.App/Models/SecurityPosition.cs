@@ -29,13 +29,14 @@ namespace CADPort.App.Models
         /// <summary>
         /// Lots ordered for selling: largest loss% first (top of stack, most
         /// attractive to harvest) through largest gain% last (most expensive to sell).
+        /// Uses the tax-aware key so tax-exempt lots are treated as neutral.
         /// </summary>
-        public IEnumerable<TaxLot> LotsInSellOrder => Lots.OrderBy(l => l.GainLossPercent);
+        public IEnumerable<TaxLot> LotsInSellOrder => Lots.OrderBy(l => l.SortGainLossPercent);
 
         /// <summary>
         /// Lots ordered bottom-to-top for stacking: the reverse of the sell order
         /// so that the most attractive lot ends up visually on top.
         /// </summary>
-        public IEnumerable<TaxLot> LotsBottomToTop => Lots.OrderByDescending(l => l.GainLossPercent);
+        public IEnumerable<TaxLot> LotsBottomToTop => Lots.OrderByDescending(l => l.SortGainLossPercent);
     }
 }

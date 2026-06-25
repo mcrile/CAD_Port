@@ -27,6 +27,15 @@ namespace CADPort.App.Models
         public double GainLossPercent => CostBasis > 0 ? UnrealizedGainLoss / CostBasis : 0.0;
 
         /// <summary>
+        /// Tax-aware sort key. A lot is only ordered by its embedded gain/loss when
+        /// selling it actually has a tax consequence - i.e. a taxable, non-cash lot.
+        /// Tax-exempt accounts and cash sort as neutral (0), so flipping an account
+        /// to tax-exempt drops its lots out of the harvest ordering.
+        /// </summary>
+        public double SortGainLossPercent =>
+            (Account != null && Account.IsTaxable && !Security.IsCash) ? GainLossPercent : 0.0;
+
+        /// <summary>
         /// Unrealized gain/loss divided by market value. Drives color intensity
         /// per the spec.
         /// </summary>

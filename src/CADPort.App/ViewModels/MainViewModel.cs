@@ -169,6 +169,10 @@ namespace CADPort.App.ViewModels
         {
             var trades = TradeEngine.GenerateTrades(Portfolio);
 
+            // Reflect the net proceeds/cost of the proposed trades in each account's
+            // cash column so cash visibly rises on sales and falls on purchases.
+            TradeEngine.SyncCashPostTrade(Portfolio, trades);
+
             Trades.Clear();
             foreach (var t in trades.OrderBy(t => t.Account.Name).ThenBy(t => t.Security.XIndex))
                 Trades.Add(new TradeRowViewModel(t));

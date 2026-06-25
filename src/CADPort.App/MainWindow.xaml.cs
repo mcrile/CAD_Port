@@ -30,9 +30,16 @@ namespace CADPort.App
 
             Loaded += (_, _) => RebuildScene();
 
+            // Camera controls are on by default; set them explicitly so nothing can
+            // leave them disabled. Left-drag orbits, right-drag pans, wheel zooms.
+            Viewport.IsRotationEnabled = true;
+            Viewport.IsPanEnabled = true;
+            Viewport.IsZoomEnabled = true;
+
             Viewport.PreviewMouseLeftButtonDown += Viewport_PreviewMouseLeftButtonDown;
             Viewport.PreviewMouseMove += Viewport_PreviewMouseMove;
             Viewport.PreviewMouseLeftButtonUp += Viewport_PreviewMouseLeftButtonUp;
+            Viewport.LostMouseCapture += (_, _) => _dragging = false;
         }
 
         // ---- Scene -------------------------------------------------------------
@@ -61,17 +68,21 @@ namespace CADPort.App
 
         private void Viewport_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (_scene == null) return;
+
             var pt = e.GetPosition(Viewport);
             var visual = Viewport.FindNearestVisual(pt);
             if (visual == null) return;
 
             if (_scene.PostTradePlanes.TryGetValue(visual, out var dragPos))
             {
-                // Begin dragging this post-trade plane.
+                // Begin dragging this post-trade plane. Handling the event (plus the
+                // mouse capture) stops the camera controller from orbiting while we
+                // drag - without ever disabling the global rotation flag, so orbit
+                // can't get stuck off.
                 _vm.SelectedPosition = dragPos;
                 _dragPosition = dragPos;
                 _dragging = true;
-                Viewport.IsRotationEnabled = false;
                 Viewport.CaptureMouse();
                 e.Handled = true;
                 return;
@@ -79,7 +90,7 @@ namespace CADPort.App
 
             if (_scene.Selectable.TryGetValue(visual, out var selPos))
             {
-                // Plain selection (camera orbit still allowed).
+                // Plain selection - not handled, so left-drag still orbits the camera.
                 _vm.SelectedPosition = selPos;
             }
         }
@@ -117,7 +128,6 @@ namespace CADPort.App
             _dragging = false;
             _dragPosition = null;
             Viewport.ReleaseMouseCapture();
-            Viewport.IsRotationEnabled = true;
             e.Handled = true;
         }
 
