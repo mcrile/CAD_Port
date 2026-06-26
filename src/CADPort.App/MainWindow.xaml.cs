@@ -27,6 +27,7 @@ namespace CADPort.App
             _vm = new MainViewModel();
             DataContext = _vm;
             _vm.SceneInvalidated += RebuildScene;
+            _vm.ViewChanged += () => { RebuildScene(); Viewport.ZoomExtents(); };
 
             Loaded += (_, _) => RebuildScene();
 
@@ -51,7 +52,8 @@ namespace CADPort.App
                 foreach (var v in _scene.Visuals)
                     Viewport.Children.Remove(v);
 
-            _builder = new PortfolioSceneBuilder(_vm.Portfolio, _vm.ZMode);
+            _builder = new PortfolioSceneBuilder(_vm.Portfolio, _vm.ZMode,
+                _vm.VisibleAccounts, _vm.ShowAggregate);
             _scene = _builder.Build();
 
             foreach (var v in _scene.Visuals)

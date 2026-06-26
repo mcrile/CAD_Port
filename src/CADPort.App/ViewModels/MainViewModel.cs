@@ -17,8 +17,16 @@ namespace CADPort.App.ViewModels
         public ObservableCollection<TradeRowViewModel> Trades { get; } = new();
         public MetricsViewModel Metrics { get; } = new();
 
+        public const string AllAccountsLabel = "All Portfolios";
+
+        /// <summary>View filter options: "All Portfolios" plus each account by name.</summary>
+        public ObservableCollection<string> ViewOptions { get; } = new();
+
         /// <summary>Raised when the 3D scene needs to be rebuilt (data or mode changed).</summary>
         public event Action SceneInvalidated;
+
+        /// <summary>Raised when the visible-account filter changes (rebuild + refit camera).</summary>
+        public event Action ViewChanged;
 
         public ICommand HouseholdRebalanceCommand { get; }
         public ICommand AccountRebalanceCommand { get; }
@@ -31,6 +39,11 @@ namespace CADPort.App.ViewModels
 
             foreach (var account in Portfolio.Accounts)
                 Accounts.Add(new AccountConfigViewModel(account, OnAccountConfigChanged));
+
+            ViewOptions.Add(AllAccountsLabel);
+            foreach (var account in Portfolio.Accounts)
+                ViewOptions.Add(account.Name);
+            _selectedView = AllAccountsLabel;
 
             HouseholdRebalanceCommand = new RelayCommand(() =>
             {
@@ -60,6 +73,39 @@ namespace CADPort.App.ViewModels
 
             Recompute();
         }
+
+        // ---- View filter (single portfolio vs all) -----------------------------
+
+        private string _selectedView;
+        public string SelectedView
+        {
+            get => _selectedView;
+            set
+            {
+                if (Set(ref _selectedView, value))
+                {
+                    SelectedPosition = null; // avoid a stale selection from a hidden row
+                    Raise(nameof(IsSinglePortfolioView));
+                    ViewChanged?.Invoke(); // rebuild + refit camera to the new view
+                }
+            }
+        }
+
+        public bool IsSinglePortfolioView => _selectedView != AllAccountsLabel;
+
+        /// <summary>The accounts to render given the current view filter.</summary>
+        public IReadOnlyList<Account> VisibleAccounts
+        {
+            get
+            {
+                if (_selectedView == AllAccountsLabel) return Portfolio.Accounts;
+                var acct = Portfolio.Accounts.FirstOrDefault(a => a.Name == _selectedView);
+                return acct != null ? new List<Account> { acct } : Portfolio.Accounts;
+            }
+        }
+
+        /// <summary>The aggregate row is only meaningful when viewing all portfolios.</summary>
+        public bool ShowAggregate => _selectedView == AllAccountsLabel;
 
         // ---- Z axis mode -------------------------------------------------------
 

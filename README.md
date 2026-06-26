@@ -48,6 +48,9 @@ Or open `CADPort.sln` in Visual Studio and press **F5**.
 - **Auto rebalance:** *Mode A* (household aggregate) or *Mode B* (account-level) place
   post-trade planes; the trade engine derives the trades.
 - **Z toggle:** switch between Market Value and Portfolio Weight.
+- **View selector (top-right):** focus on a single portfolio or show all. In
+  single-portfolio mode only that account renders (no aggregate row) and the Z-scale
+  and camera refit to it — useful for dense models with many securities.
 - **Accept Trades:** applies proposals to holdings (current holdings only change here),
   reconciles cash, and resets post-trade planes.
 

@@ -18,6 +18,7 @@
                                ShowCoordinateSystem="True"
                                ShowViewCube="True"
                                ViewCubeHorizontalPosition="Right"
+                               ViewCubeVerticalPosition="Bottom"
                                IsHeadLightEnabled="False"
                                CameraRotationMode="Turntable">
                 <!-- Mostly-ambient flat lighting: true colors from every angle, no
@@ -46,6 +47,19 @@
                     <TextBlock Text="▬ Gold plane = post-trade (click + drag)" Foreground="#FFD14A" FontSize="11"/>
                     <TextBlock Text="■ Yellow overlay = proposed trade (over stack = sell, above = buy)" Foreground="#FFE38A" FontSize="11" Margin="0,3,0,0"/>
                     <TextBlock Text="Left-drag: orbit   Right-drag: pan   Wheel: zoom" Foreground="#9AA0A8" FontSize="10" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- View selector (single portfolio vs all) -->
+            <Border HorizontalAlignment="Right" VerticalAlignment="Top" Margin="12"
+                    Background="#CC1E2127" CornerRadius="6" Padding="10" BorderBrush="#3A3F4A" BorderThickness="1">
+                <StackPanel Width="170">
+                    <TextBlock Text="VIEW" FontWeight="Bold" Foreground="#FFD14A" FontSize="11"/>
+                    <ComboBox Margin="0,5,0,0"
+                              ItemsSource="{Binding ViewOptions}"
+                              SelectedItem="{Binding SelectedView, Mode=TwoWay}"/>
+                    <TextBlock Text="Showing one portfolio" FontSize="10" Foreground="#9AA0A8" Margin="0,5,0,0"
+                               Visibility="{Binding IsSinglePortfolioView, Converter={StaticResource BoolToVisibility}}"/>
                 </StackPanel>
             </Border>
         </Grid>

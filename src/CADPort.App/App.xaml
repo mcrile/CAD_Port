@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
         <!-- Dark, CAD-like palette -->
         <SolidColorBrush x:Key="PanelBackground" Color="#1E2127"/>
         <SolidColorBrush x:Key="PanelForeground" Color="#E6E8EC"/>

@@ -43,21 +43,38 @@ namespace CADPort.App.Visualization
         private const byte OverlayAlpha = 130;
 
         private readonly Portfolio _portfolio;
+        private readonly IReadOnlyList<Account> _visibleAccounts;
+        private readonly bool _showAggregate;
+        private readonly Dictionary<Account, int> _rowIndex = new();
 
         public ZAxisMode Mode { get; }
         public double ZScale { get; private set; }
 
-        public PortfolioSceneBuilder(Portfolio portfolio, ZAxisMode mode)
+        public PortfolioSceneBuilder(Portfolio portfolio, ZAxisMode mode,
+            IReadOnlyList<Account> visibleAccounts = null, bool showAggregate = true)
         {
             _portfolio = portfolio;
             Mode = mode;
+            _visibleAccounts = visibleAccounts ?? portfolio.Accounts;
+            _showAggregate = showAggregate && portfolio.Aggregate != null;
+
+            // Pack the visible rows from y=0 so a single portfolio sits at the front
+            // instead of leaving gaps where hidden accounts used to be.
+            for (var i = 0; i < _visibleAccounts.Count; i++)
+                _rowIndex[_visibleAccounts[i]] = i;
+            if (_showAggregate)
+                _rowIndex[_portfolio.Aggregate] = _visibleAccounts.Count;
+
             ZScale = ComputeZScale();
         }
 
         // ---- Public geometry helpers (used by the drag handler) ----------------
 
         public Point3D CellOrigin(Account account, Security security)
-            => new(security.XIndex * XSpacing, account.YIndex * YSpacing, 0);
+        {
+            var row = _rowIndex.TryGetValue(account, out var r) ? r : 0;
+            return new(security.XIndex * XSpacing, row * YSpacing, 0);
+        }
 
         public double Denominator(Account account)
             => account.IsAggregate ? _portfolio.HouseholdValue : _portfolio.AccountValue(account);
@@ -80,11 +97,12 @@ namespace CADPort.App.Visualization
             AddGround(result);
             AddAxisLabels(result);
 
-            foreach (var account in _portfolio.Accounts)
+            foreach (var account in _visibleAccounts)
                 foreach (var security in _portfolio.Securities)
                     BuildCell(result, _portfolio.GetPosition(account, security));
 
-            BuildAggregateRow(result);
+            if (_showAggregate)
+                BuildAggregateRow(result);
             return result;
         }
 
@@ -220,10 +238,11 @@ namespace CADPort.App.Visualization
 
         private void AddGround(SceneBuildResult result)
         {
+            var rowCount = _visibleAccounts.Count + (_showAggregate ? 1 : 0);
             var width = (_portfolio.Securities.Count + 1) * XSpacing;
-            var length = (_portfolio.Accounts.Count + 2) * YSpacing;
+            var length = (rowCount + 1) * YSpacing;
             var centerX = (_portfolio.Securities.Count - 1) * XSpacing / 2.0;
-            var centerY = (_portfolio.Accounts.Count) * YSpacing / 2.0;
+            var centerY = (rowCount - 1) * YSpacing / 2.0;
 
             var grid = new GridLinesVisual3D
             {
@@ -256,14 +275,14 @@ namespace CADPort.App.Visualization
             }
 
             // Account labels down the side (Y axis), including aggregate.
-            var rows = new List<Account>(_portfolio.Accounts);
-            if (_portfolio.Aggregate != null) rows.Add(_portfolio.Aggregate);
+            var rows = new List<Account>(_visibleAccounts);
+            if (_showAggregate) rows.Add(_portfolio.Aggregate);
             foreach (var account in rows)
             {
                 result.Visuals.Add(new BillboardTextVisual3D
                 {
                     Text = account.Name,
-                    Position = new Point3D(-XSpacing * 0.85, account.YIndex * YSpacing, 0.2),
+                    Position = new Point3D(-XSpacing * 0.85, _rowIndex[account] * YSpacing, 0.2),
                     Foreground = account.IsAggregate ? Brushes.Violet : Brushes.LightGray,
                     FontSize = 13,
                     FontWeight = System.Windows.FontWeights.Bold
@@ -286,13 +305,15 @@ namespace CADPort.App.Visualization
         {
             double max = 0;
 
-            foreach (var pos in _portfolio.Positions)
-            {
-                max = Math.Max(max, Metric(pos.CurrentMarketValue, pos.Account));
-                max = Math.Max(max, Metric(pos.PostTradeMarketValue, pos.Account));
-            }
+            // Scale to the visible rows only, so a single portfolio fills the view.
+            foreach (var account in _visibleAccounts)
+                foreach (var pos in _portfolio.Positions.Where(p => p.Account == account))
+                {
+                    max = Math.Max(max, Metric(pos.CurrentMarketValue, pos.Account));
+                    max = Math.Max(max, Metric(pos.PostTradeMarketValue, pos.Account));
+                }
 
-            if (_portfolio.Aggregate != null)
+            if (_showAggregate)
             {
                 foreach (var s in _portfolio.Securities)
                 {
