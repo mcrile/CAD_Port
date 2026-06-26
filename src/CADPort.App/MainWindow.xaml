@@ -57,7 +57,16 @@
                     <TextBlock Text="VIEW" FontWeight="Bold" Foreground="#FFD14A" FontSize="11"/>
                     <ComboBox Margin="0,5,0,0"
                               ItemsSource="{Binding ViewOptions}"
-                              SelectedItem="{Binding SelectedView, Mode=TwoWay}"/>
+                              SelectedItem="{Binding SelectedView, Mode=TwoWay}">
+                        <!-- Dark text on the default light dropdown. A local Foreground on
+                             the TextBlock beats the app-wide (light) TextBlock style, so
+                             both the selection box and the dropdown items stay readable. -->
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="#1A1D23"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                     <TextBlock Text="Showing one portfolio" FontSize="10" Foreground="#9AA0A8" Margin="0,5,0,0"
                                Visibility="{Binding IsSinglePortfolioView, Converter={StaticResource BoolToVisibility}}"/>
                 </StackPanel>

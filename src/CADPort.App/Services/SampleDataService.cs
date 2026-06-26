@@ -22,8 +22,10 @@ namespace CADPort.App.Services
             portfolio.Securities.AddRange(new[] { cash, spy, vea, bnd, vnq });
 
             // ---- Household model (sums to 1.0) ---------------------------------
-            portfolio.ModelWeights["CASH"] = 0.05;
-            portfolio.ModelWeights["SPY"] = 0.40;
+            // Small residual cash target; the rest is invested prorata across the
+            // securities. Cash deposits/withdrawals flow into these targets prorata.
+            portfolio.ModelWeights["CASH"] = 0.03;
+            portfolio.ModelWeights["SPY"] = 0.42;
             portfolio.ModelWeights["VEA"] = 0.20;
             portfolio.ModelWeights["BND"] = 0.25;
             portfolio.ModelWeights["VNQ"] = 0.10;

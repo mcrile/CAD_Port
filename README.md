@@ -84,9 +84,11 @@ raises `SceneInvalidated` → the window rebuilds the 3D scene from
 These are deliberate, documented choices where the spec left room:
 
 - **Cash adjustment:** an account's post-trade total value = current value +
-  `CashAdjustment` (positive = add/deposit, negative = raise/withdraw). Targets apply
-  to that post value, so raising cash forces net sales. Rebalances respect it exactly;
-  cash is never traded directly (it's the residual funding security).
+  `CashAdjustment` (positive = add/deposit, negative = raise/withdraw). Both the model
+  target plane and the rebalance apply the model weights to that post value, so a
+  deposit/withdrawal flows prorata into every security's target. The model carries a
+  small residual cash target (~3%); cash is never traded directly (it's the residual
+  funding security), so raising cash forces net sales.
 - **Mode A vs B:** Mode B sets every account to model weight × its post value (cash =
   residual). Mode A matches the model at the household level, distributing each
   security's household target across accounts in proportion to current holdings (so

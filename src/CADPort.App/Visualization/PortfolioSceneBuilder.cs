@@ -112,7 +112,10 @@ namespace CADPort.App.Visualization
             var origin = CellOrigin(pos.Account, pos.Security);
 
             BuildHoldingsStack(result, pos, origin);
-            BuildModelPlane(result, origin, pos.TargetWeight * _portfolio.AccountValue(pos.Account), pos.Account);
+            // Model target is taken on the post-adjustment value, so a cash deposit or
+            // withdrawal flows prorata into every security's target (matching the
+            // rebalance and the aggregate row's household target).
+            BuildModelPlane(result, origin, pos.TargetWeight * _portfolio.AccountPostValue(pos.Account), pos.Account);
             BuildPostTradePlane(result, pos, origin);
             BuildOverlays(result, pos, origin);
         }
