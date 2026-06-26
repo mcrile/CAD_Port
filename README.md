@@ -39,8 +39,9 @@ Or open `CADPort.sln` in Visual Studio and press **F5**.
     large gain. Tax-exempt accounts and cash are white. Materials are flat/matte
     (no specular) so colors stay legible from any angle.
   - **Thin translucent plane** = model target. **Gold plane** = post-trade (editable).
-  - **Red overlay** = proposed sale (holdings above the post-trade plane).
-    **Blue overlay** = proposed purchase (gap above holdings).
+  - **Yellow overlay** = proposed trade — a light-yellow block filling the gap
+    between current holdings and the post-trade plane (overlapping the stack = sale,
+    floating above it = purchase). Also shown on the aggregate row.
 - **Construct a trade manually:** click a stack or its gold plane to select it, then
   **drag the gold plane** up/down (snaps to whole shares), or use the slider / ±1 / ±10
   buttons in the Selected Position panel. Trades, metrics, and overlays update live.

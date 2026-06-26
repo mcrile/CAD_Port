@@ -38,6 +38,10 @@ namespace CADPort.App.Visualization
         private const double ModelPlaneThickness = 0.03;
         private const double PostPlaneThickness = 0.07;
 
+        // Proposed-trade overlay: light yellow, consistent with the gold post-trade plane.
+        private static readonly Color OverlayColor = Color.FromRgb(0xFF, 0xE3, 0x8A);
+        private const byte OverlayAlpha = 130;
+
         private readonly Portfolio _portfolio;
 
         public ZAxisMode Mode { get; }
@@ -143,25 +147,29 @@ namespace CADPort.App.Visualization
 
             var currentZ = Z(pos.CurrentMarketValue, pos.Account);
             var postZ = Z(pos.PostTradeMarketValue, pos.Account);
+            BuildTradeOverlay(result, origin, currentZ, postZ, pos);
+        }
 
-            if (postZ < currentZ - 1e-4)
-            {
-                // proposed sale: holdings above the post-trade plane (red)
-                var h = currentZ - postZ;
-                var box = MakeBox(origin.X, origin.Y, postZ + h / 2.0,
-                    OverlayW, OverlayL, h, Color.FromRgb(0xE5, 0x3E, 0x3E), 110);
-                result.Visuals.Add(box);
-                result.Selectable[box] = pos;
-            }
-            else if (postZ > currentZ + 1e-4)
-            {
-                // proposed purchase: space between holdings and post-trade plane (blue)
-                var h = postZ - currentZ;
-                var box = MakeBox(origin.X, origin.Y, currentZ + h / 2.0,
-                    OverlayW, OverlayL, h, Color.FromRgb(0x3E, 0x8C, 0xE5), 110);
-                result.Visuals.Add(box);
-                result.Selectable[box] = pos;
-            }
+        /// <summary>
+        /// Render the proposed trade as a single light-yellow block spanning the gap
+        /// between current holdings and the post-trade plane (consistent with the
+        /// gold plane). The block is anchored on the current-holdings level: a block
+        /// that overlaps the existing bars is a sale, one floating above them is a
+        /// purchase - the direction reads from where it sits relative to the stack.
+        /// </summary>
+        private void BuildTradeOverlay(SceneBuildResult result, Point3D origin,
+            double currentZ, double postZ, SecurityPosition selectable)
+        {
+            if (Math.Abs(postZ - currentZ) < 1e-4) return;
+
+            var lo = Math.Min(currentZ, postZ);
+            var hi = Math.Max(currentZ, postZ);
+            var h = hi - lo;
+
+            var box = MakeBox(origin.X, origin.Y, lo + h / 2.0,
+                OverlayW, OverlayL, h, OverlayColor, OverlayAlpha);
+            result.Visuals.Add(box);
+            if (selectable != null) result.Selectable[box] = selectable;
         }
 
         private void BuildAggregateRow(SceneBuildResult result)
@@ -198,6 +206,13 @@ namespace CADPort.App.Visualization
                 var plane = MakeBox(origin.X, origin.Y, postZ + PostPlaneThickness / 2.0,
                     PlaneW, PlaneL, PostPlaneThickness, Color.FromRgb(0xB0, 0x8A, 0xD8), 150);
                 result.Visuals.Add(plane);
+
+                // Aggregate proposed-trade overlay (informational, not selectable).
+                if (!security.IsCash)
+                {
+                    var aggCurrentZ = Z(_portfolio.AggregateCurrentValue(security), agg);
+                    BuildTradeOverlay(result, origin, aggCurrentZ, postZ, null);
+                }
             }
         }
 

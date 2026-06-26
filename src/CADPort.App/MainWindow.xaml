@@ -44,7 +44,7 @@
                     <TextBlock Text="● Green lot = embedded gain (costly)" Foreground="#9BE0A8" FontSize="11"/>
                     <TextBlock Text="▬ Thin plane = model target" Foreground="#9BB6D8" FontSize="11"/>
                     <TextBlock Text="▬ Gold plane = post-trade (click + drag)" Foreground="#FFD14A" FontSize="11"/>
-                    <TextBlock Text="■ Red overlay = sale   ■ Blue overlay = buy" Foreground="#C8CCD2" FontSize="11" Margin="0,3,0,0"/>
+                    <TextBlock Text="■ Yellow overlay = proposed trade (over stack = sell, above = buy)" Foreground="#FFE38A" FontSize="11" Margin="0,3,0,0"/>
                     <TextBlock Text="Left-drag: orbit   Right-drag: pan   Wheel: zoom" Foreground="#9AA0A8" FontSize="10" Margin="0,6,0,0"/>
                 </StackPanel>
             </Border>
