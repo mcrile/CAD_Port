@@ -28,7 +28,8 @@ namespace CADPort.App.Services
 
         /// <summary>
         /// Map intensity in roughly [-Saturation, +Saturation] to the gradient.
-        /// Negative (loss) -> green, zero -> white, positive (gain) -> red.
+        /// Negative (loss) -> red, zero -> white, positive (gain) -> green.
+        /// (Losses read as red to match common P&L convention.)
         /// </summary>
         public static Color ForIntensity(double intensity)
         {
@@ -36,20 +37,20 @@ namespace CADPort.App.Services
 
             if (t < 0)
             {
-                // loss: white -> light green -> dark green
+                // loss: white -> pink -> red
                 var a = -t; // 0..1
                 return a < 0.5
-                    ? Lerp(White, LightGreen, a / 0.5)
-                    : Lerp(LightGreen, DarkGreen, (a - 0.5) / 0.5);
+                    ? Lerp(White, Pink, a / 0.5)
+                    : Lerp(Pink, Red, (a - 0.5) / 0.5);
             }
 
             if (t > 0)
             {
-                // gain: white -> pink -> red
+                // gain: white -> light green -> dark green
                 var a = t; // 0..1
                 return a < 0.5
-                    ? Lerp(White, Pink, a / 0.5)
-                    : Lerp(Pink, Red, (a - 0.5) / 0.5);
+                    ? Lerp(White, LightGreen, a / 0.5)
+                    : Lerp(LightGreen, DarkGreen, (a - 0.5) / 0.5);
             }
 
             return White;

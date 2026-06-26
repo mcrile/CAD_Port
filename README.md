@@ -35,9 +35,10 @@ Or open `CADPort.sln` in Visual Studio and press **F5**.
   - **X axis = security** (Cash first), **Y axis = account** (+ an Aggregate row), **Z axis = position size**.
   - Each **box is a tax lot**; height ∝ market value. Lots stack with the most
     attractive-to-sell lot (largest loss %) on top.
-  - **Color (taxable accounts):** dark green = large loss → white = neutral → red =
-    large gain. Tax-exempt accounts and cash are white.
-  - **Thin translucent plane** = model target. **Thick gold plane** = post-trade (editable).
+  - **Color (taxable accounts):** dark red = large loss → white = neutral → green =
+    large gain. Tax-exempt accounts and cash are white. Materials are flat/matte
+    (no specular) so colors stay legible from any angle.
+  - **Thin translucent plane** = model target. **Gold plane** = post-trade (editable).
   - **Red overlay** = proposed sale (holdings above the post-trade plane).
     **Blue overlay** = proposed purchase (gap above holdings).
 - **Construct a trade manually:** click a stack or its gold plane to select it, then

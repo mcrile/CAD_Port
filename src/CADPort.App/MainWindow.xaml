@@ -18,9 +18,20 @@
                                ShowCoordinateSystem="True"
                                ShowViewCube="True"
                                ViewCubeHorizontalPosition="Right"
-                               IsHeadLightEnabled="True"
+                               IsHeadLightEnabled="False"
                                CameraRotationMode="Turntable">
-                <h:DefaultLights/>
+                <!-- Mostly-ambient flat lighting: true colors from every angle, no
+                     specular hotspots. Two dim opposing directionals add just enough
+                     shading to read the box edges. -->
+                <ModelVisual3D>
+                    <ModelVisual3D.Content>
+                        <Model3DGroup>
+                            <AmbientLight Color="#D2D2D2"/>
+                            <DirectionalLight Color="#383838" Direction="-1,-1,-2"/>
+                            <DirectionalLight Color="#2A2A2A" Direction="1,1,-1"/>
+                        </Model3DGroup>
+                    </ModelVisual3D.Content>
+                </ModelVisual3D>
             </h:HelixViewport3D>
 
             <!-- Legend overlay -->
@@ -29,8 +40,8 @@
                 <StackPanel>
                     <TextBlock Text="WORKSPACE" FontWeight="Bold" Foreground="#FFD14A" FontSize="11"/>
                     <TextBlock Text="X = Security   Y = Account   Z = Size" FontSize="11" Margin="0,3,0,6"/>
-                    <TextBlock Text="● Green lot = embedded loss (harvest)" Foreground="#9BE0A8" FontSize="11"/>
-                    <TextBlock Text="● Red lot = embedded gain (costly)" Foreground="#F2A8B8" FontSize="11"/>
+                    <TextBlock Text="● Red lot = embedded loss (harvest)" Foreground="#F2A8B8" FontSize="11"/>
+                    <TextBlock Text="● Green lot = embedded gain (costly)" Foreground="#9BE0A8" FontSize="11"/>
                     <TextBlock Text="▬ Thin plane = model target" Foreground="#9BB6D8" FontSize="11"/>
                     <TextBlock Text="▬ Gold plane = post-trade (click + drag)" Foreground="#FFD14A" FontSize="11"/>
                     <TextBlock Text="■ Red overlay = sale   ■ Blue overlay = buy" Foreground="#C8CCD2" FontSize="11" Margin="0,3,0,0"/>
@@ -147,9 +158,9 @@
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Proposed Cash"/>
                             <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Metrics.ProposedCash}" HorizontalAlignment="Right"/>
                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Realized Gains"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Metrics.RealizedGains}" HorizontalAlignment="Right" Foreground="#F2A8B8"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Metrics.RealizedGains}" HorizontalAlignment="Right" Foreground="#9BE0A8"/>
                             <TextBlock Grid.Row="4" Grid.Column="0" Text="Realized Losses"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Metrics.RealizedLosses}" HorizontalAlignment="Right" Foreground="#9BE0A8"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Metrics.RealizedLosses}" HorizontalAlignment="Right" Foreground="#F2A8B8"/>
                             <TextBlock Grid.Row="5" Grid.Column="0" Text="Net Tax Impact"/>
                             <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Metrics.NetTaxImpact}" HorizontalAlignment="Right"/>
                             <TextBlock Grid.Row="6" Grid.Column="0" Text="Harvested Losses"/>

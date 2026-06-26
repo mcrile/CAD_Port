@@ -35,8 +35,8 @@ namespace CADPort.App.Visualization
         private const double PlaneL = 1.95;
         private const double OverlayW = 1.6;
         private const double OverlayL = 1.6;
-        private const double ModelPlaneThickness = 0.05;
-        private const double PostPlaneThickness = 0.18;
+        private const double ModelPlaneThickness = 0.03;
+        private const double PostPlaneThickness = 0.07;
 
         private readonly Portfolio _portfolio;
 
@@ -294,7 +294,17 @@ namespace CADPort.App.Visualization
         {
             var brush = new SolidColorBrush(Color.FromArgb(alpha, color.R, color.G, color.B));
             brush.Freeze();
-            var material = MaterialHelper.CreateMaterial(brush);
+
+            // Flat, matte material (no specular highlight) so the box shows its true
+            // color from every angle. This is a data-viz workspace, not a 3D game -
+            // legibility of color matters more than realistic shading. A faint
+            // emissive component keeps the color readable even on shadowed faces.
+            var material = new MaterialGroup();
+            material.Children.Add(new DiffuseMaterial(brush));
+            var emissiveColor = Color.FromArgb((byte)(alpha * 0.25),
+                color.R, color.G, color.B);
+            material.Children.Add(new EmissiveMaterial(new SolidColorBrush(emissiveColor)));
+            material.Freeze();
 
             var box = new BoxVisual3D
             {
